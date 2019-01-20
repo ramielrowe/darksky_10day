@@ -4,7 +4,7 @@ import os
 
 from dateutil import tz
 import flask
-from forecastiopy import (ForecastIO, FIOHourly)
+from forecastiopy import (ForecastIO, FIODaily, FIOHourly)
 
 LAT=float(os.environ.get('LAT', '0.0'))
 LON=float(os.environ.get('LON', '0.0'))
@@ -45,23 +45,45 @@ def get_forecast():
         'humidity': [],
         'pressure': [],
         'wind_speed': [],
-        'wind_gust': []
+        'wind_gust': [],
+        'daily': [],
     }
 
     today = datetime.datetime(now.year, now.month, now.day)
     for i in range(0, 10):
         time = (today + datetime.timedelta(days=i)).isoformat()
         FIO = ForecastIO.ForecastIO(API_KEY, latitude=LAT, longitude=LON, time=time)
+        
+        daily = FIODaily.FIODaily(FIO)
+        day = daily.get(0)
+        forecast['daily'].append({
+            'icon': day.get('icon', 'unknown'),
+            'summary': day['summary'],
+            'precip': {
+                'probability': day.get('precipProbability', 0.0)*100,
+                'accumulation': day.get('precipAccumulation ', 0.0),
+                'type': day.get('precipType ', 'rain'),
+            },
+            'temp': {
+                'low': day['temperatureLow'],
+                'high': day['temperatureHigh'], 
+                'apparentLow': day['apparentTemperatureLow'],
+                'apparentHigh': day['apparentTemperatureHigh'], 
+            }
+        })
+
         hourly = FIOHourly.FIOHourly(FIO)
         for h in range(0, hourly.hours()):
             hour = hourly.get_hour(h)
             now = datetime.datetime.utcnow()
             raw_utc = datetime.datetime.fromtimestamp(hour['time'])
-            if raw_utc < now - datetime.timedelta(hours=1):
-                continue
             utc = raw_utc.replace(tzinfo=tz.gettz('UTC'))
             eastern = utc.astimezone(tz.gettz('America/New_York'))
             fmttime = eastern.strftime("%-d %a %-I:%M %p")
+            if raw_utc < now - datetime.timedelta(hours=1):
+                if len(forecast['days']) == 0:
+                    forecast['days'].append(eastern.strftime("%-d %a"))
+                continue
             if eastern.hour == 0 and eastern.minute == 0:
                 forecast['days'].append(eastern.strftime("%-d %a"))
             forecast['time'].append(fmttime)

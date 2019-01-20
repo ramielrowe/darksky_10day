@@ -1,1 +1,3 @@
-include darksky_10day/static/*.html
+include darksky_10day/static/*
+include darksky_10day/static/font/*
+include darksky_10day/static/css/*

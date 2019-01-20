@@ -3,21 +3,203 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" integrity="sha256-MZo5XY1Ah7Z2Aui4/alkfeiq3CopMdV/bbkc/Sh41+s=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js" integrity="sha256-65VrZtDIgFNXMsE+kzBqH4uB8vpABjMijjAnb9x8ViY=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="static/css/weather-icons.min.css">
+        <style>
+            .day-summary-box {
+                display: inline-block;
+                width: 80px;
+                padding-left: 5px;
+                padding-right: 5px;
+                border: 2px solid black;
+            }
+            .day-summary-date {
+                width: 100%;
+                display: inline-block;
+                text-align: center;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                font-weight: bold;
+                font-size: 1.1em;
+            }
+            .day-summary-icon {
+                width: 100%;
+                text-align: center;
+                font-size: 1.8em;
+                font-weight: 600;
+                padding-top: 5px;
+                padding-bottom: 5px;
+            }
+            .day-summary-temp-low {
+                width: 45%;
+                margin-right: auto;
+                margin-left: auto;
+                display: inline-block;
+                padding-top: 7px;
+                padding-bottom: 5px;
+                text-align: center;
+                color: rgb(0,0,139);
+                font-weight: bold;
+            }
+            .day-summary-temp-high {
+                width: 45%;
+                margin-right: auto;
+                margin-left: auto;
+                display: inline-block;
+                padding-top: 7px;
+                padding-bottom: 5px;
+                text-align: center;
+                color: rgb(139,0,0);
+                font-weight: bold;
+            }
+            .day-summary-precip-prob {
+                width: 45%;
+                margin-right: auto;
+                margin-left: auto;
+                display: inline-block;
+                padding-top: 5px;
+                padding-bottom: 6px;
+                text-align: center;
+                font-weight: bold;
+            }
+            .day-summary-precip-accum {
+                width: 45%;
+                margin-right: auto;
+                margin-left: auto;
+                display: inline-block;
+                padding-top: 5px;
+                padding-bottom: 7px;
+                text-align: center;
+                font-weight: bold;
+            }
+            .day-summary-precip-type-snow {
+                color: rgb(216, 128, 240);
+            }
+            .day-summary-precip-type-rain {
+                color: rgb(55, 128, 206);
+            }
+        </style>
     </head>
     <body>
-        <div style="width: 1000px; margin-right: auto; margin-left: auto;">
-            <div style="height: 250px; margin-right: auto;">
-                <canvas id="temp" width="1000px" height="250px"></canvas>
+        <div style="width:1000px; margin-right: auto; margin-left: auto;">
+            <div id="day-summary-box-1" class="day-summary-box">
+                <div id='day-summary-date-1' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-1' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-1' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-1' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-1' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-1' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-2" class="day-summary-box">
+                <div id='day-summary-date-2' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-2' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-2' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-2' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-2' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-2' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-3" class="day-summary-box">
+                <div id='day-summary-date-3' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-3' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-3' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-3' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-3' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-3' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-4" class="day-summary-box">
+                <div id='day-summary-date-4' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-4' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-4' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-4' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-4' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-4' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-5" class="day-summary-box">
+                <div id='day-summary-date-5' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-5' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-5' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-5' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-5' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-5' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-6" class="day-summary-box">
+                <div id='day-summary-date-6' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-6' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-6' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-6' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-6' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-6' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-7" class="day-summary-box">
+                <div id='day-summary-date-7' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-7' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-7' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-7' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-7' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-7' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-8" class="day-summary-box">
+                <div id='day-summary-date-8' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-8' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-8' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-8' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-8' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-8' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-9" class="day-summary-box">
+                <div id='day-summary-date-9' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-9' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-9' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-9' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-9' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-9' class="day-summary-precip-accum"></div>
+            </div>
+            <div id="day-summary-box-10" class="day-summary-box">
+                <div id='day-summary-date-10' class="day-summary-date"></div><br />
+                <i id='day-summary-icon-10' class="day-summary-icon"></i><br />
+                <div id='day-summary-temp-low-10' class="day-summary-temp-low"></div> <div id='day-summary-temp-high-10' class="day-summary-temp-high"></div><br />
+                <div id='day-summary-precip-prob-10' class="day-summary-precip-prob"></div> <div id='day-summary-precip-accum-10' class="day-summary-precip-accum"></div>
+            </div>
+        </div><br />
+        <div style="width: 800px; margin-right: auto; margin-left: auto;">
+            <div style="height: 250px; margin-right: auto; margin-left: auto;">
+                <canvas id="temp" width="800px" height="250px"></canvas>
             </div><br />
-            <div style="height: 250; margin-right: auto;">
-                <canvas id="precip" width="1000px" height="250px"></canvas>
+            <div style="height: 250; margin-right: auto; margin-left: auto;">
+                <canvas id="precip" width="800px" height="250px"></canvas>
             </div><br />
-            <div style="height: 250; margin-right: auto;">
-                <canvas id="atmos" width="1000px" height="250px"></canvas>
+            <div style="height: 250; margin-right: auto; margin-left: auto;">
+                <canvas id="atmos" width="800px" height="250px"></canvas>
             </div>
         </div>
         <script>
+                var wi_class_for_icon = function(icon) {
+                    switch(icon) {
+                        case "rain":
+                            return "wi-day-rain";
+                        case "wind":
+                            return "wi-day-windy";
+                        case "partly-cloudy-day":
+                            return "wi-day-cloudy";
+                        case "partly-cloudy-night":
+                            return "wi-night-alt-cloudy";
+                        default:
+                            return "wi-na";
+                    };
+                };
+            var precip_class_for_type = function(type) {
+                switch(type) {
+                    case "rain":
+                        return "day-summary-precip-type-rain";
+                    case "snow":
+                        return "day-summary-precip-type-snow";
+                    default:
+                        return "day-summary-precip-type-rain";
+                };
+            };
+
             $.getJSON( "./weather", function( data ) {
+                var i;
+                for (i = 0; i < data.days.length; i++) {
+                    var elementI = i + 1;
+                    var dateElem = document.getElementById('day-summary-date-'+elementI);
+                    dateElem.innerText = data.days[i];
+                    var iconElem = document.getElementById('day-summary-icon-'+elementI);
+                    iconElem.classList.add("wi")
+                    iconElem.classList.add(wi_class_for_icon(data.daily[i].icon))
+                    var tempLowElem = document.getElementById('day-summary-temp-low-'+elementI);
+                    tempLowElem.innerText = Math.round(data.daily[i].temp.low) + '°F';
+                    var tempHighElem = document.getElementById('day-summary-temp-high-'+elementI);
+                    tempHighElem.innerText = Math.round(data.daily[i].temp.high) + '°F';
+                    var precipProbElem = document.getElementById('day-summary-precip-prob-'+elementI);
+                    precipProbElem.innerText = data.daily[i].precip.probability + "%";
+                    precipProbElem.classList.add(precip_class_for_type(data.daily[i].precip.type))
+                    var precipAccumElem = document.getElementById('day-summary-precip-accum-'+elementI);
+                    precipAccumElem.innerText = data.daily[i].precip.accumulation + " in";
+                    precipAccumElem.classList.add(precip_class_for_type(data.daily[i].precip.type))
+                }
+
                 var dayAnnotations = [];
                 data.days.forEach(function (item) {
                     dayAnnotations.push({
