@@ -1,0 +1,194 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.min.js" integrity="sha256-MZo5XY1Ah7Z2Aui4/alkfeiq3CopMdV/bbkc/Sh41+s=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/0.5.7/chartjs-plugin-annotation.js" integrity="sha256-65VrZtDIgFNXMsE+kzBqH4uB8vpABjMijjAnb9x8ViY=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div style="width: 1000px; margin-right: auto; margin-left: auto;">
+            <div style="height: 250px; margin-right: auto;">
+                <canvas id="temp" width="1000px" height="250px"></canvas>
+            </div><br />
+            <div style="height: 250; margin-right: auto;">
+                <canvas id="precip" width="1000px" height="250px"></canvas>
+            </div><br />
+            <div style="height: 250; margin-right: auto;">
+                <canvas id="atmos" width="1000px" height="250px"></canvas>
+            </div>
+        </div>
+        <script>
+            $.getJSON( "./weather", function( data ) {
+                var dayAnnotations = [];
+                data.days.forEach(function (item) {
+                    dayAnnotations.push({
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x-axis-0',
+                        value: item+' 12:00 AM',
+                        borderColor: 'rgb(169,169,169)',
+                        borderWidth: 2,
+                        label: {
+                            enabled: true,
+                            content: item,
+                            position: 'top',
+                        },
+
+                    });
+                });
+                var dayAnnotationsNoLabels = [];
+                data.days.forEach(function (item) {
+                    dayAnnotationsNoLabels.push({
+                        type: 'line',
+                        mode: 'vertical',
+                        scaleID: 'x-axis-0',
+                        value: item+' 12:00 AM',
+                        borderColor: 'rgb(169,169,169)',
+                        borderWidth: 2,
+                        label: {
+                            enabled: false,
+                            content: item,
+                        },
+
+                    });
+                });
+
+                var tempCtx = document.getElementById("temp").getContext("2d");
+                var tempChart = new Chart(tempCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.time,
+                        datasets: [{
+                            label: 'Temp',
+                            data: data.temperature,  
+                            fill: false,
+                            pointRadius: 0,
+                            borderColor: 'rgb(220,20,60)',
+                            backgroundColor: 'rgb(240,128,128)',
+                        }],
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [
+                                {id: 'y-axis-0', ticks: {max: Math.max(...data.temperature)+10}},
+                            ],
+                            xAxes: [
+                                {id: 'x-axis-0', display: false, position: 'top', offset: false},
+                            ],
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltips: {
+                            position: 'average',
+                            intersect: false,
+                        },
+                        annotation: {
+                            annotations: [{
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'y-axis-0',
+                                value: 32,
+                                borderColor: 'rgb(162,210,223)',
+                                borderWidth: 3,
+                                label: {
+                                    enabled: false,
+                                    content: 'Freezing Point'
+                                }
+                            }].concat(dayAnnotations)
+                        }
+                    }
+                });
+
+                var precipCtx = document.getElementById("precip").getContext("2d");
+                var precipChart = new Chart(precipCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.time,
+                        datasets: [{
+                            label: 'Precip',
+                            data: data.precipitation,
+                            fill: true,
+                            steppedLine: 'after',
+                            pointRadius: 0,
+                            borderColor: 'rgb(135,206,235)',
+                            backgroundColor: 'rgb(240,248,255)'
+                        }, {
+                            label: 'Humidity',
+                            data: data.humidity,
+                            fill: false,
+                            pointRadius: 0,
+                            borderColor: 'rgb(34,139,34)',
+                            backgroundColor: 'rgb(144,238,144)'
+                        }],
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [
+                                {id: 'y-axis-0', position: 'left', 'ticks': {min: 0, max: 100}},
+                            ],
+                            xAxes: [
+                                {id: 'x-axis-0', display: false},
+                            ],
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltips: {
+                            position: 'average',
+                            intersect: false,
+                        },
+                        annotation: {
+                            annotations: [].concat(dayAnnotationsNoLabels)
+                        }
+                    }
+                });
+
+                var atmosCtx = document.getElementById("atmos").getContext("2d");
+                var atmosChart = new Chart(atmosCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.time,
+                        datasets: [{
+                            yAxisID: 'y-axis-0',
+                            label: 'Wind Speed',
+                            data: data.wind_speed,
+                            fill: false,
+                            pointRadius: 0,
+                            borderColor: 'rgb(0,0,139)',
+                            backgroundColor: 'rgb(30,144,255)'
+                        }, {
+                            yAxisID: 'y-axis-0',
+                            label: 'Wind Gust',
+                            data: data.wind_gust,
+                            fill: true,
+                            pointRadius: 0,
+                            borderColor: 'rgb(135,206,235)',
+                            backgroundColor: 'rgb(240,248,255)'
+                        }],
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [
+                                {id: 'y-axis-0', position: 'left', 'ticks': {min: 0}},
+                            ],
+                            xAxes: [
+                                {id: 'x-axis-0', display: false},
+                            ],
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltips: {
+                            position: 'average',
+                            intersect: false,
+                        },
+                        annotation: {
+                            annotations: [].concat(dayAnnotationsNoLabels)
+                        }
+                    }
+                });
+            });
+            
+        </script>
+    </body>
+</html>
