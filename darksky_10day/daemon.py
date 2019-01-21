@@ -56,12 +56,18 @@ def get_forecast():
         
         daily = FIODaily.FIODaily(FIO)
         day = daily.get(0)
+        precipAccum = 0.0
+        if 'precipAccumulation' in day:
+            precipAccum = round(day['precipAccumulation'], 1)
+        elif 'precipIntensity' in day:
+            precipAccum = round(day['precipIntensity'] * 24, 1)
+
         forecast['daily'].append({
             'icon': day.get('icon', 'unknown'),
             'summary': day['summary'],
             'precip': {
                 'probability': day.get('precipProbability', 0.0)*100,
-                'accumulation': day.get('precipAccumulation ', 0.0),
+                'accumulation': precipAccum,
                 'type': day.get('precipType ', 'rain'),
             },
             'temp': {

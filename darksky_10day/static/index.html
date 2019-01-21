@@ -156,10 +156,22 @@
         <script>
                 var wi_class_for_icon = function(icon) {
                     switch(icon) {
+                        case "clear-day":
+                            return "wi-day-sunny";
+                        case "clear-night":
+                            return "wi-night-clear";
                         case "rain":
                             return "wi-day-rain";
                         case "wind":
                             return "wi-day-windy";
+                        case "snow":
+                            return "wi-snow";
+                        case "sleet":
+                            return "wi-sleet";
+                        case "fog":
+                            return "wi-fog";
+                        case "cloudy":
+                            return "wi-cloudy";
                         case "partly-cloudy-day":
                             return "wi-day-cloudy";
                         case "partly-cloudy-night":
@@ -173,6 +185,8 @@
                     case "rain":
                         return "day-summary-precip-type-rain";
                     case "snow":
+                        return "day-summary-precip-type-snow";
+                    case "sleet":
                         return "day-summary-precip-type-snow";
                     default:
                         return "day-summary-precip-type-rain";
@@ -196,7 +210,7 @@
                     precipProbElem.innerText = data.daily[i].precip.probability + "%";
                     precipProbElem.classList.add(precip_class_for_type(data.daily[i].precip.type))
                     var precipAccumElem = document.getElementById('day-summary-precip-accum-'+elementI);
-                    precipAccumElem.innerText = data.daily[i].precip.accumulation + " in";
+                    precipAccumElem.innerText = data.daily[i].precip.accumulation + "''";
                     precipAccumElem.classList.add(precip_class_for_type(data.daily[i].precip.type))
                 }
 
