@@ -207,7 +207,7 @@
                     var tempHighElem = document.getElementById('day-summary-temp-high-'+elementI);
                     tempHighElem.innerText = Math.round(data.daily[i].temp.high) + '°F';
                     var precipProbElem = document.getElementById('day-summary-precip-prob-'+elementI);
-                    precipProbElem.innerText = data.daily[i].precip.probability + "%";
+                    precipProbElem.innerText = Math.round(data.daily[i].precip.probability) + "%";
                     precipProbElem.classList.add(precip_class_for_type(data.daily[i].precip.type))
                     var precipAccumElem = document.getElementById('day-summary-precip-accum-'+elementI);
                     precipAccumElem.innerText = data.daily[i].precip.accumulation + "''";
