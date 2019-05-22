@@ -248,6 +248,21 @@
                     });
                 });
 
+                if (Math.min(...data.temperature) < 42) {
+                    dayAnnotations.push({
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'y-axis-0',
+                                value: 32,
+                                borderColor: 'rgb(162,210,223)',
+                                borderWidth: 3,
+                                label: {
+                                    enabled: false,
+                                    content: 'Freezing Point'
+                                }
+                    });
+                }
+
                 var tempCtx = document.getElementById("temp").getContext("2d");
                 var tempChart = new Chart(tempCtx, {
                     type: 'line',
@@ -279,18 +294,7 @@
                             intersect: false,
                         },
                         annotation: {
-                            annotations: [{
-                                type: 'line',
-                                mode: 'horizontal',
-                                scaleID: 'y-axis-0',
-                                value: 32,
-                                borderColor: 'rgb(162,210,223)',
-                                borderWidth: 3,
-                                label: {
-                                    enabled: false,
-                                    content: 'Freezing Point'
-                                }
-                            }].concat(dayAnnotations)
+                            annotations: dayAnnotations,
                         }
                     }
                 });
