@@ -141,4 +141,4 @@ def get_forecast(lat, lon):
 
 if __name__ == '__main__':
     APP.config['DEBUG'] = True
-    APP.run(port=8000)
+    APP.run(host='0.0.0.0', port=8000)
