@@ -1,6 +1,6 @@
 FROM python:3.7-alpine
 
-RUN pip install python-dateutil flask forecastiopy gunicorn 
+RUN pip install python-dateutil flask forecastiopy gunicorn redis
 
 ADD . /src
 RUN cd /src && python setup.py install && pip install gunicorn

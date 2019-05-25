@@ -5,17 +5,35 @@ import os
 from dateutil import tz
 import flask
 from forecastiopy import (ForecastIO, FIODaily, FIOHourly, FIOAlerts)
+import redis
 
 TZ_EASTERN = tz.gettz('America/New_York')
+
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
+REDIS_DB = int(os.environ.get('REDIS_PORT', '0'))
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 
 LAT = float(os.environ.get('LAT', '0.0'))
 LON = float(os.environ.get('LON', '0.0'))
 API_KEY = os.environ.get('API_KEY', '')
-FORECAST_CACHE_FILE = os.environ.get('FORECAST_CACHE_FILE', '/tmp/forecast.json')
 FORECAST_CACHE_MINUTES = int(os.environ.get('FORECAST_CACHE_MINUTES', '30'))
+FORECAST_CACHE_RADIUS = float(os.environ.get('FORECAST_CACHE_RADIUS', '8'))
 FLASK_STATIC_FOLDER = os.environ.get('FLASK_STATIC_FOLDER', 'static')
 
 APP = flask.Flask(__name__, static_folder=FLASK_STATIC_FOLDER)
+
+REDIS_CLIENT = None
+
+
+def redis_client():
+    global REDIS_CLIENT
+    if not REDIS_CLIENT:
+        REDIS_CLIENT = redis.Redis(host=REDIS_HOST,
+                                   port=REDIS_PORT,
+                                   db=REDIS_DB,
+                                   password=REDIS_PASSWORD)
+    return REDIS_CLIENT
 
 
 @APP.route("/")
@@ -25,7 +43,7 @@ def index():
 
 @APP.route("/weather")
 def weather():
-    return flask.jsonify(get_forecast())
+    return flask.jsonify(get_forecast(LAT, LON))
 
 
 def utc_to_eastern(datetime):
@@ -38,12 +56,12 @@ def unix_to_eastern(timestamp):
     return utc_to_eastern(raw_utc)
 
 
-def get_forecast():
+def get_forecast(lat, lon):
     now = utc_to_eastern(datetime.datetime.utcnow())
 
-    if os.path.isfile(FORECAST_CACHE_FILE):
-        with open(FORECAST_CACHE_FILE, 'r') as fp:
-            forecast = json.load(fp)
+    forecasts = redis_client().georadius('forecast', lat, lon, FORECAST_CACHE_RADIUS, unit='km')
+    if forecasts:
+        forecast = forecasts[0]
         captured = datetime.datetime.fromisoformat(forecast['captured'])
         if captured > now - datetime.timedelta(minutes=FORECAST_CACHE_MINUTES):
             return forecast
@@ -115,8 +133,7 @@ def get_forecast():
         if this_day is not None:
             forecast['days'].append(this_day)
 
-    with open(FORECAST_CACHE_FILE, 'w') as fp:
-        json.dump(forecast, fp)
+    redis_client().geoadd('forecast', lat, lon, forecast)
 
     return forecast
 
