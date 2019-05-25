@@ -62,7 +62,6 @@ def get_forecast(lat, lon):
     forecasts = redis_client().georadius('forecast', lat, lon, FORECAST_CACHE_RADIUS, unit='km')
     if forecasts:
         forecast = forecasts[0]
-        forecast = json.loads(forecast)
         captured = datetime.datetime.fromisoformat(forecast['captured'])
         if captured > now - datetime.timedelta(minutes=FORECAST_CACHE_MINUTES):
             return forecast
@@ -134,7 +133,7 @@ def get_forecast(lat, lon):
         if this_day is not None:
             forecast['days'].append(this_day)
 
-    redis_client().geoadd('forecast', lat, lon, json.dumps(forecast))
+    redis_client().geoadd('forecast', lat, lon, forecast)
 
     return forecast
 
