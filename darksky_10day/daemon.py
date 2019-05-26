@@ -46,7 +46,6 @@ def index():
 
 @APP.route("/weather")
 def weather():
-    zipcode = request.args.get('zip')
     if request.args.get('zip'):
         location = geo.zip_to_location(request.args.get('zip'))
     elif request.args.get('lat') and request.args.get('lon'):
