@@ -192,8 +192,12 @@
                         return "day-summary-precip-type-rain";
                 };
             };
-
-            $.getJSON( "./weather", function( data ) {
+            const urlParams = new URLSearchParams(window.location.search);
+            var weatherUrl = './weather';
+            if (urlParams.toString()) {
+                weatherUrl = `${weatherUrl}?${urlParams.toString()}`;
+            }
+            $.getJSON(weatherUrl, function( data ) {
                 var i;
                 for (i = 0; i < data.days.length; i++) {
                     var elementI = i + 1;

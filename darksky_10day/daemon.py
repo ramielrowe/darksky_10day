@@ -4,8 +4,11 @@ import os
 
 from dateutil import tz
 import flask
+from flask import request
 from forecastiopy import (ForecastIO, FIODaily, FIOHourly, FIOAlerts)
 import redis
+
+from darksky_10day import geo
 
 TZ_EASTERN = tz.gettz('America/New_York')
 
@@ -43,7 +46,15 @@ def index():
 
 @APP.route("/weather")
 def weather():
-    return flask.jsonify(get_forecast(LAT, LON))
+    zipcode = request.args.get('zip')
+    if request.args.get('zip'):
+        location = geo.zip_to_location(request.args.get('zip'))
+    elif request.args.get('lat') and request.args.get('lon'):
+        location = geo.lat_lon_to_location(request.args.get('lat'),
+                                           request.args.get('lon'))
+    else:
+        location = geo.lat_lon_to_location(LAT, LON)
+    return flask.jsonify(get_forecast(location.lat, location.lon))
 
 
 def utc_to_eastern(datetime):
@@ -59,7 +70,7 @@ def unix_to_eastern(timestamp):
 def get_forecast(lat, lon):
     now = utc_to_eastern(datetime.datetime.utcnow())
 
-    forecasts = redis_client().georadius('forecast', lat, lon, FORECAST_CACHE_RADIUS, unit='km')
+    forecasts = redis_client().georadius('forecast', lon, lat, FORECAST_CACHE_RADIUS, unit='km')
     if forecasts:
         forecast = json.loads(forecasts[0])
         captured = datetime.datetime.fromisoformat(forecast['captured'])
@@ -83,7 +94,7 @@ def get_forecast(lat, lon):
     today = datetime.datetime(now.year, now.month, now.day, tzinfo=TZ_EASTERN)
     for i in range(0, 10):
         time = (today + datetime.timedelta(days=i)).isoformat()
-        FIO = ForecastIO.ForecastIO(API_KEY, latitude=LAT, longitude=LON, time=time)
+        FIO = ForecastIO.ForecastIO(API_KEY, latitude=lat, longitude=lon, time=time)
 
         hourly_precip_intense_accum = 0.0
         hourly = FIOHourly.FIOHourly(FIO)
@@ -133,7 +144,7 @@ def get_forecast(lat, lon):
         if this_day is not None:
             forecast['days'].append(this_day)
 
-    redis_client().geoadd('forecast', lat, lon, json.dumps(forecast))
+    redis_client().geoadd('forecast', lon, lat, json.dumps(forecast))
 
     return forecast
 

@@ -13,6 +13,7 @@ setup(name='darksky_10day',
           'python-dateutil',
           'flask',
           'forecastiopy',
-          'redis'
+          'redis',
+          'requests'
       ]
 )
